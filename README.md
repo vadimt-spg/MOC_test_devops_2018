@@ -1,6 +1,6 @@
 Tests for candidates 2018
-1. Dockerize app, make possible to run with docker-compose
-1.1 App should consist of such components
+1. Dockerize app, make possible to run with docker-compose.
+1.1 App should consist of such components.
 1.1.1. nginx
 1.1.2. Frontend
 1.1.3. Backend
