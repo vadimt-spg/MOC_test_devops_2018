@@ -1,0 +1,67 @@
+- hosts: all
+  become: yes
+  tasks:
+    - name: Create swapfile
+      shell: fallocate -l 1M /swapfile
+
+    - name: Create swap fs
+      shell: mkswap /swapfile
+
+    - name: Change permession for swapfile
+      file:
+              path: /swapfile
+              mode: 0600
+             
+
+    - name: Add swapfile entry to fstab
+      lineinfile:
+              path: /etc/fstab
+              line: '/swapfile swap swap defaults 0 0'
+    
+    - name: Enable swap
+      shell: swapon -a
+
+    - name: Install pre soft for docker-ce
+      action: apt pkg={{item}} state=present
+      with_items:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - software-properties-common
+
+    - name: Install nginx
+      apt:
+              name: nginx
+              state: latest
+
+    - name: Install PostgreSQL
+      apt:
+              name: postgresql
+              state: latest
+
+    - name: Install redis
+      apt:
+              name: redis-server
+              state: latest
+
+    - name: Add GPG key for docker repo
+      shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+    - name: Add docker repo
+      shell: add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+    - name: Update and install docker
+      apt:
+        name: docker-ce
+        install_recommends: yes
+        update_cache: yes
+
+    - name: Install docker-compose
+      shell: curl -L "https://github.com/docker/compose/releases/download/1.23.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+    - name: Configure docker-compose
+      file:
+              path: /usr/local/bin/docker-compose
+              mode: "+x"
+
+
