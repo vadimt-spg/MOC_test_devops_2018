@@ -14,7 +14,7 @@ services:
         ipv4_address: 172.16.238.2
 
   back:
-    image: backend-image
+    build: ./testapp
     restart: always
     ports:
       - "3000:3000"
@@ -25,7 +25,7 @@ services:
         ipv4_address: 172.16.238.3
     
   front:
-    image: frontend-image
+    build: ./testContainerAngular
     restart: always
     depends_on:
       - back
