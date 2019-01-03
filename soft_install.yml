@@ -21,18 +21,30 @@
     - name: Enable swap
       shell: swapon -a
 
-    - name: Install pre soft for docker-ce
+    - name: Install pre soft 
       action: apt pkg={{item}} state=present
       with_items:
         - apt-transport-https
         - ca-certificates
         - curl
         - software-properties-common
+        - build-essential
+        - libpq-dev
 
     - name: Install nginx
       apt:
               name: nginx
               state: latest
+
+    - name: Copy nginx configuration
+      copy:
+              src: ./ansible_default.conf
+              dest: /etc/nginx/conf.d/default.conf
+    
+    - name: Restart nginx
+      systemd:
+              state: reloaded
+              name: nginx
 
     - name: Install PostgreSQL
       apt:
@@ -64,4 +76,22 @@
               path: /usr/local/bin/docker-compose
               mode: "+x"
 
+    - name: Add node repo
+      shell: curl -sL https://deb.nodesource.com/setup_8.x | bash -
+
+    - name: Install node
+      apt:
+              name: nodejs
+              install_recommends: yes
+              update_cache: yes
+
+    - name: Install forever module for node
+      shell: npm install -g forever
+
+    - name: Install Ruby
+      action: apt pkg={{item}} state=present
+      with_items:
+        - ruby
+        - ruby-bundler
+        - ruby-dev
 
