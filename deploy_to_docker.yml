@@ -1,0 +1,11 @@
+- hosts: all
+  become: yes
+  tasks:
+    - name: Clone/Pull from git repo 
+      git:
+              repo: https://github.com/vadimt-spg/MOC_test_devops_2018
+              dest: /home/$USER/MOC_test_devops_2018
+              force: yes
+
+    - name: Build and start docker apps
+      shell: cd /home/$USER/MOC_test_devops_2018/ && docker-compose up -d --force-recreate --build
