@@ -1,0 +1,28 @@
+- hosts: all
+  # become: yes
+  tasks:
+    - name: Clone/Pull from git repo 
+      git:
+              repo: https://github.com/vadimt-spg/MOC_test_devops_2018
+              dest: /home/$USER/MOC_test_devops_2018
+              force: yes
+
+    - name: Kill running frontend
+      shell: kill $(ps aux | grep -E "bin/ng$" | awk '{ print $2 }') && kill $(ps aux | grep -E "angular/cli$" | awk '{ print $2 }')
+      ignore_errors: yes
+
+    - name: Deploy frontend
+      shell: cd /home/$USER/MOC_test_devops_2018/testContainerAngular/ && npm install
+
+    - name: Start frontend
+      shell: cd /home/$USER/MOC_test_devops_2018/testContainerAngular/ && forever start node_modules/@angular/cli/bin/ng serve  --prod
+    
+    - name: Deploy backend
+      shell: cd /home/$USER/MOC_test_devops_2018/testapp/ && bundle install
+
+    - name: Kill running backend
+      shell: kill $(ps aux | grep -E "puma" | grep -v grep | awk '{ print $2 }')
+      ignore_errors: yes
+
+    - name: Start backend
+      shell: cd /home/$USER/MOC_test_devops_2018/testapp/ &&  bundle exec puma -d -C ./config/puma.rb 
